@@ -5,6 +5,8 @@ const { resolve } = require('path')
 
 mongoose.Promise = global.Promise
 
+// 初始化Schemas。
+// Schema定义了collection里documents的模板。每一个Schema都会映射到MongoDB的一个collection上
 exports.initSchemas = () => {
   glob.sync(resolve(__dirname, './schema', '**/*.js')).forEach(require)
 }
@@ -13,21 +15,20 @@ exports.initSchemas = () => {
 exports.initAdmin = async () => {
   const User = mongoose.model('User')
   let user = await User.findOne({
-    username: 'zjn225'
+    username: 'admin'
   })
-
   if (!user) {
     const user = new User({
-      username: 'zjn225',
+      username: 'admin',
       email: '740627396@qq.com',
-      password: '000420',
+      password: 'admin',
       role: 'admin'
     })
-
     await user.save()
   }
 }
 
+// 和数据库建立连接
 exports.connect = () => {
   let maxConnectTimes = 0
 
@@ -40,7 +41,6 @@ exports.connect = () => {
 
     mongoose.connection.on('disconnected', () => {
       maxConnectTimes++
-
       if (maxConnectTimes < 5) {
         mongoose.connect(db)
       } else {
@@ -51,7 +51,6 @@ exports.connect = () => {
     mongoose.connection.on('error', err => {
       console.log(err)
       maxConnectTimes++
-
       if (maxConnectTimes < 5) {
         mongoose.connect(db)
       } else {
@@ -60,14 +59,8 @@ exports.connect = () => {
     })
 
     mongoose.connection.once('open', () => {
-      // const Dog = mongoose.model('Dog', { name: String })
-      // const doga = new Dog({ name: '阿尔法' })
-
-      // doga.save().then(() => {
-      //   console.log('wang')
-      // })
       resolve()
-      console.log('MongoDB Connected successfully!')
+      console.log('MongoDB Connected successfully！！！!')
     })
   })
 }

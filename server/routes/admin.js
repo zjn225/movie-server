@@ -5,6 +5,7 @@ const {
   del,
   auth,
   admin,
+  put,
   required
 } = require('../lib/decorator')
 const {
@@ -12,50 +13,21 @@ const {
 } = require('../service/user')
 const {
   getAllMovies,
-  findAndRemove
+  findAndRemove,
+  updateMovieItem
 } = require('../service/movie')
 
-// 其实是一个命名空间
 @controller('/admin')
 export class adminController {
-  @get('/movie/list')
-  @auth
-  @admin('admin')
-  async getMovieList (ctx, next) {
-    console.log('admin movie list')
-    const movies = await getAllMovies()
 
-    ctx.body = {
-      success: true,
-      data: movies
-    }
-  }
-
-  @del('/movies')
-  @required({
-    query: ['id']
-  })
-  async remove (ctx, next) {
-    const id = ctx.query.id
-
-    await findAndRemove(id)
-
-    const movies = await getAllMovies()
-
-    ctx.body = {
-      data: movies,
-      success: true
-    }
-  }
-
-  // 登录
+  // 登录认证
   @post('/login')
   @required({
-    body: ['email', 'password']
+    body: ['username', 'password']
   })
-  async login (ctx, next) {
-    const { email, password } = ctx.request.body
-    const matchData = await checkPassword(email, password)
+  async login(ctx, next) {
+    const { username, password } = ctx.request.body
+    const matchData = await checkPassword(username, password)
 
     if (!matchData.user) {
       return (ctx.body = {
@@ -64,14 +36,8 @@ export class adminController {
       })
     }
 
+    // 设置session
     if (matchData.match) {
-      ctx.session.user = {
-        _id: matchData.user._id,
-        email: matchData.user.email,
-        role: matchData.user.role,
-        username: matchData.user.username
-      }
-
       return (ctx.body = {
         success: true
       })
@@ -81,5 +47,45 @@ export class adminController {
       success: false,
       err: '密码不正确'
     })
+  }
+
+  // 获取电影列列表
+  @get('/movie/list')
+  async getMovieList(ctx, next) {
+    const movies = await getAllMovies()
+    ctx.body = {
+      success: true,
+      data: movies
+    }
+  }
+
+  // 删除电影
+  @del('/movies')
+  @required({
+    query: ['id']
+  })
+  async remove(ctx, next) {
+    const id = ctx.query.id
+    await findAndRemove(id)
+    const movies = await getAllMovies()
+    ctx.body = {
+      data: movies,
+      success: true
+    }
+  }
+
+  // 更新电影
+  @put('/movieItem')
+  @required({
+    body: ['id', 'poster', 'rawTitle', 'movieTypes', 'pubdate']
+  })
+  async update(ctx, next) {
+    const { id, poster, rawTitle, movieTypes, pubdate } = ctx.request.body
+    await updateMovieItem(id, poster, rawTitle, movieTypes, pubdate)
+    const movies = await getAllMovies()
+    ctx.body = {
+      data: movies,
+      success: true
+    }
   }
 }

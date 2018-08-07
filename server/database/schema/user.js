@@ -61,7 +61,6 @@ userSchema.pre('save', function (next) {
   // 密码加盐操作
   bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
     if (err) return next(err)
-
     bcrypt.hash(this.password, salt, (error, hash) => {
       if (error) return next(error)
       this.password = hash

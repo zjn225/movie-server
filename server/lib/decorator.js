@@ -12,14 +12,14 @@ const isArray = c => _.isArray(c) ? c : [c]
 
 // Route实例
 export class Route {
-  constructor (app, apiPath) {
+  constructor(app, apiPath) {
     this.app = app
     this.apiPath = apiPath
     this.router = new Router()
   }
 
   // 初始化函数
-  init () {
+  init() {
     glob.sync(resolve(this.apiPath, './**/*.js')).forEach(require)
     // 遍历map集合
     for (let [conf, controller] of routerMap) {
@@ -40,7 +40,7 @@ const normalizePath = path => path.startsWith('/') ? path : `/${path}`
 
 // 装饰器router 
 const router = conf => (target, key, descriptor) => {
-  console.log("target：",target,"key：",key)
+  console.log("target：", target, "key：", key)
   conf.path = normalizePath(conf.path)
   //构建map集合，map(key,value)
   routerMap.set({
@@ -83,14 +83,8 @@ export const all = path => router({
   path: path
 })
 
-
-
-
-
-
-
 const decorate = (args, middleware) => {
-  let [ target, key, descriptor ] = args
+  let [target, key, descriptor] = args
 
   target[key] = isArray(target[key])
   target[key].unshift(middleware)
@@ -100,52 +94,47 @@ const decorate = (args, middleware) => {
 
 const convert = middleware => (...args) => decorate(args, middleware)
 
-export const auth = convert(async (ctx, next) => {
-  console.log('ctx.session.user')
-  console.log(ctx.session.user)
-  if (!ctx.session.user) {
-    return (
-      ctx.body = {
-        success: false,
-        code: 401,
-        err: '登录信息失效，重新登录'
-      }
-    )
-  }
+// session
+// export const auth = convert(async (ctx, next) => {
+//   console.log("'now ctx.session.user'", ctx.session)
+//   if (!ctx.session.user) {
+//     return (
+//       ctx.body = {
+//         success: false,
+//         code: 401,
+//         err: '登录信息失效，重新登录'
+//       }
+//     )
+//   }
 
-  await next()
-})
+//   await next()
+// })
 
-export const admin = roleExpected => convert(async (ctx, next) => {
-  const { role } = ctx.session.user
+// 权限 -- 管理员才有权限 
+// export const admin = roleExpected => convert(async (ctx, next) => {
+//   const { role } = ctx.session.user
+//   if (!role || role !== roleExpected) {
+//     return (
+//       ctx.body = {
+//         success: false,
+//         code: 403,
+//         err: '你没有权限，来错地方了'
+//       }
+//     )
+//   }
 
-  console.log('admin session')
-  console.log(ctx.session.user)
+//   await next()
+// })
 
-  if (!role || role !== roleExpected) {
-    return (
-      ctx.body = {
-        success: false,
-        code: 403,
-        err: '你没有权限，来错地方了'
-      }
-    )
-  }
-
-  await next()
-})
-
+// 必须包含的
 export const required = rules => convert(async (ctx, next) => {
   let errors = []
-
   const checkRules = R.forEachObjIndexed(
     (value, key) => {
       errors = R.filter(i => !R.has(i, ctx, ctx.request[key]))(value)
     }
   )
-
   checkRules(rules)
-
   if (errors.length) {
     ctx.body = {
       success: false,

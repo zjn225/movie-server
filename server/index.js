@@ -19,20 +19,21 @@ const useMiddlewares = (app) => {
 }
 
   ; (async () => {
-    await connect()
+    await connect()  //建立连接
 
-    initSchemas()
+    initSchemas()   //初始化Schemas
 
-    await initAdmin()
+    await initAdmin() //初始化管理员账号
 
-     require('./tasks/movie')
-     require('./tasks/api')
-    require('./tasks/trailer')
-    require('./tasks/qiniu')
+    // 是否需要爬取数据
+    // require('./tasks/movie')
+    // require('./tasks/api')
+    // require('./tasks/trailer')
+    // require('./tasks/qiniu')
 
     const app = new Koa()
     app.use(cors())
-    await useMiddlewares(app)  //use所有中间件，包括了路由、parcel配置
+    await useMiddlewares(app)  //use所有中间件，包括了路由
 
     // var port = Math.floor(Math.random() * 10000) + 3000
     // console.log("now port is", port)
