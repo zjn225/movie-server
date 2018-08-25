@@ -66,5 +66,5 @@ const Category = mongoose.model('Category')
       }
     })
 
-    child.send(movies)  //发送到子进程
+    child.send(movies)  //发送到父进程
   })()

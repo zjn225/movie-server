@@ -1,5 +1,4 @@
 // 查询已经存在的数据，是否有不完整的情况，是则重新抓取
-
 const rp = require('request-promise-native')
 const mongoose = require('mongoose')
 const Movie = mongoose.model('Movie')
@@ -30,7 +29,7 @@ async function fetchMovie(item) {
     ]
   })
 
-  for (let i = 0; i < movies.length; i++) {  //这里的[]是防止批量请求api，有限额
+  for (let i = 0; i < movies.length; i++) { 
     let movie = movies[i]
     if (!movie.doubanId) {
       console.log("无doubanId,正在return..........")

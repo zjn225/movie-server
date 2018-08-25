@@ -8,6 +8,7 @@ export const addBodyParser = app => {
   app.use(bodyParser())
 }
 
+// 日志记录
 export const addLogger = app => {
   app.use(logger())
 }

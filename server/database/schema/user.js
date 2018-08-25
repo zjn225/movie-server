@@ -42,8 +42,9 @@ const userSchema = new Schema({
   }
 })
 
+//当获取isLocked时触发这个操作
 userSchema.virtual('isLocked').get(function () {
-  return !!(this.lockUntil && this.lockUntil > Date.now())
+  return !!(this.lockUntil && this.lockUntil > Date.now()) //强制转换成Boolean类型
 })
 
 userSchema.pre('save', function (next) {
@@ -56,9 +57,9 @@ userSchema.pre('save', function (next) {
   next()
 })
 
+// 存储密码之前进行加密
 userSchema.pre('save', function (next) {
   if (!this.isModified('password')) return next()
-  // 密码加盐操作
   bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
     if (err) return next(err)
     bcrypt.hash(this.password, salt, (error, hash) => {
@@ -67,20 +68,30 @@ userSchema.pre('save', function (next) {
       next()
     })
   })
+  next()
 })
 
 userSchema.methods = {
+  // 密码比较
   comparePassword: (_password, password) => {
+    console.log("hi你好", _password, password)
     return new Promise((resolve, reject) => {
       bcrypt.compare(_password, password, (err, isMatch) => {
-        if (!err) resolve(isMatch)
-        else reject(err)
+        if (!err) {
+          console.log("isMatch",isMatch)
+          resolve(isMatch)
+        }
+        else{
+          reject(err)
+        }
       })
     })
   },
 
+  // 密码尝试次数限制
   incLoginAttepts: (user) => {
     return new Promise((resolve, reject) => {
+      // 未锁状态
       if (this.lockUntil && this.lockUntil < Date.now()) {
         this.update({
           $set: {
@@ -93,6 +104,7 @@ userSchema.methods = {
           if (!err) resolve(true)
           else reject(err)
         })
+        // 加锁状态，因为lockUntil在当前时间之后
       } else {
         let updates = {
           $inc: {

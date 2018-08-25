@@ -36,7 +36,7 @@ const uploadToQiniu = async (url, key) => {
 
   for (let i = 0; i < movies.length; i++) {
     let movie = movies[i]
-    // 存进出具库了但是没存进七牛云，重新上传
+    // 存进出数据库了但是没存进七牛云，重新上传
     if (movie.video && !movie.videoKey) {
       try {
         console.log('开始传 video')

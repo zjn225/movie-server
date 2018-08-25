@@ -22,13 +22,14 @@ const sleep = time => new Promise(resolve => {
 
   await sleep(3000)
 
-  await page.waitForSelector('.more')
+  await page.waitForSelector('.more') //等待这个选择器出现
 
   for (let i = 0; i < 1; i++) {
     await sleep(3000)
-    await page.click('.more')
+    await page.click('.more')  //跳转到下一页
   }
 
+  // 在浏览器中执行一段 JavaScript 代码
   const result = await page.evaluate(() => {
     var $ = window.$
     var items = $('.list-wp a')

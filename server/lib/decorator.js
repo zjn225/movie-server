@@ -94,38 +94,6 @@ const decorate = (args, middleware) => {
 
 const convert = middleware => (...args) => decorate(args, middleware)
 
-// session
-// export const auth = convert(async (ctx, next) => {
-//   console.log("'now ctx.session.user'", ctx.session)
-//   if (!ctx.session.user) {
-//     return (
-//       ctx.body = {
-//         success: false,
-//         code: 401,
-//         err: '登录信息失效，重新登录'
-//       }
-//     )
-//   }
-
-//   await next()
-// })
-
-// 权限 -- 管理员才有权限 
-// export const admin = roleExpected => convert(async (ctx, next) => {
-//   const { role } = ctx.session.user
-//   if (!role || role !== roleExpected) {
-//     return (
-//       ctx.body = {
-//         success: false,
-//         code: 403,
-//         err: '你没有权限，来错地方了'
-//       }
-//     )
-//   }
-
-//   await next()
-// })
-
 // 必须包含的
 export const required = rules => convert(async (ctx, next) => {
   let errors = []
