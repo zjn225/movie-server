@@ -1,4 +1,4 @@
-# douban-trailer-imooc
+# movie-server
 
 npm i
 
